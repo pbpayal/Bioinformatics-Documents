@@ -18,3 +18,14 @@ First check you have root priviliges
 * sudo yum install epel-release
 * sudo yum install R
 * R --version
+
+** Setting up WGS/WES pipeline requiremnets
+* Conda Install the following tools-
+  * Bwa-mem
+  * GATK
+  * Platypus
+  * Snpeff and Snpsift
+  * Gemini - flexible framework for exploring genetic variation, popultaion data <https://gemini.readthedocs.io/en/latest/index.html#>
+   For this however craete a sperate environmnet, like **conda create -n gemeini**, because its downgrading a lot of other dpeendant packages, which might cause error while running other packages!
+   
+   
