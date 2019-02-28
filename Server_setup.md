@@ -23,6 +23,8 @@ First check you have root priviliges
 * Conda Install the following tools-
   * Bwa-mem
   * GATK
+  * Picard tools
+  * Samtools
   * Platypus
   * Snpeff and Snpsift
   * Gemini - flexible framework for exploring genetic variation, popultaion data <https://gemini.readthedocs.io/en/latest/index.html#>
