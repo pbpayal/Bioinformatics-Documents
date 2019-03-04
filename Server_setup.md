@@ -23,6 +23,8 @@ First check you have root priviliges
 * Conda Install the following tools-
   * Bwa-mem
   * GATK
+  ** Download a licensed copy of GATK from the Broad Institute(https://www.broadinstitute.org/gatk/download/ (in my case GATK 3.8 from Archives)
+  **gatk3-register GenomeAnalysisTK.jar** file
   * Picard tools
   * Samtools
   ** Got an error "samtools: error while loading shared libraries: libcrypto.so.1.0.0: cannot open shared object file: No such file or directory" 
