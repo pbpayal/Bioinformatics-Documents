@@ -25,6 +25,8 @@ First check you have root priviliges
   * GATK
   * Picard tools
   * Samtools
+  ** Got an error "samtools: error while loading shared libraries: libcrypto.so.1.0.0: cannot open shared object file: No such file or directory" 
+  **conda install -c bioconda r-rcurl openssl=1.0**
   * Platypus
   * Snpeff and Snpsift
   * Gemini - flexible framework for exploring genetic variation, popultaion data <https://gemini.readthedocs.io/en/latest/index.html#>
