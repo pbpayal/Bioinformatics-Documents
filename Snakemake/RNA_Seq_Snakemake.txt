@@ -1,0 +1,105 @@
+include:
+    'configs_filepath.py'
+    
+workdir: OUT_DIR
+
+from itertools import chain, combinations
+from os.path import join
+import glob
+import re
+
+SAMPLES = glob.glob('{}**/*.fastq.gz'.format(RAWDATA_DIR), recursive=True)
+SAMPLES = [sample.replace('{}/'.format(RAWDATA_DIR),'').replace('.fastq.gz','') for sample in SAMPLES]
+SAMPLES = [('_').join(sample.split('_')[:-2])  for sample in SAMPLES]
+
+PLOT_PREFIXES = combinations(SAMPLES, 2)
+PLOT_PREFIXES_1 = [x[0] for x in PLOT_PREFIXES]
+PLOT_PREFIXES_2 = [x[1] for x in PLOT_PREFIXES]
+
+rule all:
+    input:
+        STAR_INDEX,
+        expand('qc/{sample}_R1_001_fastqc.html', sample=SAMPLES),
+        expand('qc/{sample}_R2_001_fastqc.html', sample=SAMPLES),
+        expand('mapped/counts_strict/{sample}.counts.tsv', sample=SAMPLES),
+        expand('mapped/plots/tpm_scatter/{sample1}_VS_{sample2}.png', sample1=PLOT_PREFIXES_1, sample2=PLOT_PREFIXES_2),
+        #expand('mapped/integenic_reads/{sample}.intergenic.bam', sample=SAMPLES),
+        #expand('mapped/fpkm/{sample}.FPKM.xls', sample=SAMPLES),
+        'mapped/tpm/HTSeq/masterTPM.tsv',
+        'mapped/tpm/featureCounts/masterTPM.tsv',
+        'mapped/DE_analysis/HTSeq/'+GENOME_BUILD+'.HTSeq.DESeq2.all.tsv',
+        'mapped/DE_analysis/featureCounts/'+GENOME_BUILD+'.featureCounts.DESeq2.sig.tsv',
+'multiqc_report/multiqc_report.html',
+
+rule perform_qc:
+    input:
+        R1=RAWDATA_DIR+'/{sample}_R1_001.fastq.gz',
+        R2=RAWDATA_DIR+'/{sample}_R2_001.fastq.gz'
+    params:
+        out_dir = 'qc'
+    output:
+       'qc/{sample}_R1_001_fastqc.html',
+       'qc/{sample}_R1_001_fastqc.zip',
+       'qc/{sample}_R2_001_fastqc.html',
+       'qc/{sample}_R2_001_fastqc.zip',
+    shell:
+        r'''
+            fastqc -o {params.out_dir} -f fastq {input.R1} {input.R2}
+'''
+
+rule map_star:
+    input:
+        R1='preprocessed/{sample}/{sample}_R1_001_val_1.fq.gz',
+        R2='preprocessed/{sample}/{sample}_R2_001_val_2.fq.gz',
+        index=STAR_INDEX
+    output: 'mapped/bams/{sample}.bam'
+    params:
+        prefix = 'mapped/bams/{sample}',
+        unmapped = 'unmapped/fastq/{sample}',
+        starlogs = 'mapped/starlogs'
+    threads: 16
+    shell:
+        r'''
+        STAR --runThreadN {threads}\
+             --genomeDir {input.index}\
+             --outFileNamePrefix {params.prefix} --readFilesIn {input.R1} {input.R2}\
+             --outSAMtype BAM SortedByCoordinate\
+             --outFilterMatchNmin 50\
+             --outFilterMismatchNmax 100\
+             --readFilesCommand zcat\
+             --outReadsUnmapped {params.unmapped} && mv {params.prefix}Aligned.sortedByCoord.out.bam {output} && mkdir -p {params.starlogs} && mv {params.prefix}Log.final.out {params.prefix}Log.out {params.prefix}Log.progress.out {params.starlogs}
+        '''
+"""
+
+rule sort_by_name:
+    input: 'mapped/bams/{sample}.bam'
+    output: 'mapped/bams/{sample}.sortedByName.bam'
+    shell:
+        r'''
+            samtools sort -on {input} -T /tmp/ -o {output}
+        '''
+rule count:
+    input: 'mapped/bams/{sample}.sortedByName.bam'
+    params:
+        annotation=GTF,
+        phred_cutoff=5
+    output: 'mapped/counts_strict/{sample}.counts.tsv'
+    shell:
+        r'''
+        source activate clipseq2 && htseq-count --order=name --format=bam --mode=intersection-strict --stranded=no --minaqual={params.phred_cutoff} --type=exon --idattr=gene_id {input} {params.annotation} > {output}
+'''
+
+rule run_multiqc:
+    input:
+        expand('qc/{sample_name}_R1_001_fastqc.html', sample_name=SAMPLES),
+        expand('qc/{sample_name}_R2_001_fastqc.html', sample_name=SAMPLES),
+        expand('mapped/post_mapping_deduplication/{sample}/output.DupRate_plot.r', sample=SAMPLES),
+        expand('mapped/bam_metrics/{sample}.metrics', sample=SAMPLES),
+        expand('mapped/post_mapping_qualimap/{sample}/qualimapReport.html', sample=SAMPLES),
+        expand('mapped/bams/{sample}.bam', sample=SAMPLES),
+        'mapped/DE_analysis/HTSeq/'+GENOME_BUILD+'.HTSeq.DESeq2.sig.tsv',
+        'mapped/DE_analysis/featureCounts/'+GENOME_BUILD+'.featureCounts.DESeq2.sig.tsv',
+    output:
+        'multiqc_report/multiqc_report.html'
+    shell:
+'export LC_ALL=en_US.UTF-8 && multiqc -f --outdir multiqc_report .'
