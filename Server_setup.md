@@ -14,6 +14,12 @@ First check you have root priviliges
 * conda config --add channels conda-forge
 * Add at least 2 environmnets python2 and python3
 
+*** Always insatll conda environment in the following as recommended by Bioconda
+<p align="center">
+    <img src="images/" />
+</p>  
+
+
 **Install R** - https://linuxize.com/post/how-to-install-r-on-centos-7/
 * sudo yum install epel-release
 * sudo yum install R
