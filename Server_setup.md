@@ -15,8 +15,9 @@ First check you have root priviliges
 * Add at least 2 environmnets python2 and python3
 
 *** Always insatll conda environment in the following as recommended by Bioconda
+https://bioconda.github.io/#set-up-channels
 <p align="center">
-    <img src="images/" />
+    <img src="images/Screen Shot 2019-05-14 at 4.29.24 PM.png" />
 </p>  
 
 
