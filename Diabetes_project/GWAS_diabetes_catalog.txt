@@ -15,5 +15,7 @@ Diabetes-Obesity NGS Panel (Fulgent - NCBI) - https://www.ncbi.nlm.nih.gov/gtr/t
 
 Asper-bio Gene panel - https://www.asperbio.com/asper-endocrinology/maturity-onset-diabetes-of-the-young-mody-ngs-panel/
 
+GeneDX panel - https://www.genedx.com/test-catalog/available-tests/mody-sequencing-panel-1/
+
 
 
