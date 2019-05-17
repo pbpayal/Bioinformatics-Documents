@@ -1,1 +1,9 @@
 https://www.ebi.ac.uk/gwas/search?query=Type%202%20diabetes
+
+A paper like this - Genetics of PCOS: A systematic bioinformatics approach to unveil the proteins responsible for PCOS
+https://www.sciencedirect.com/science/article/pii/S2213596016300447
+
+Genetics Gene Panel - https://www.fulgentgenetics.com/Diabetes-Obesity
+
+Neonatal Screening, University of Chicago - https://dnatesting.uchicago.edu/tests/neonatal-diabetes-mellitus-sequencing-panel
+
