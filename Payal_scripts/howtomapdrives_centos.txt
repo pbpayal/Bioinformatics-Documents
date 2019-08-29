@@ -1,0 +1,19 @@
+sudo mkfs.xfs /dev/sdb
+created a mountpoint
+sudo mkdir /data
+and mounted the drive there
+sudo mount /dev/sdb /data
+
+Next add to fstab
+# /etc/fstab
+# Created by anaconda on Fri Dec 28 11:40:44 2018
+#
+# Accessible filesystems, by reference, are maintained under ‘/dev/disk’
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+/dev/mapper/centos-root /                       xfs     defaults        0 0
+UUID=4c0191a7-4145-4e2d-a800-3c16e1557739 /boot                   xfs     defaults        0 0
+UUID=2079-FE93          /boot/efi               vfat    umask=0077,shortname=winnt 0 0
+/dev/mapper/centos-home /home                   xfs     defaults        0 0
+/dev/mapper/centos-swap swap                    swap    defaults        0 0
+/dev/sdb /data                                  xfs     defaults        0 0
