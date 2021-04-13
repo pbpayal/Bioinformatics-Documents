@@ -1,0 +1,43 @@
+#Basic GIT tutorial
+
+
+#First change dir to desired dir
+cd DIR
+
+#Check if you are on desired dir
+pwd DIR
+
+#Check status of dir, if its git repositiory or not
+git status
+
+#If above step says, not a git repository move perform "git init" or move over to next steps
+git init
+
+#This is to add a particular file to staging area
+git add filename
+
+#This is to add all file in dir to staging area
+git add -a 
+git add -all
+#After adding, check the status of the dir/repo
+git status
+
+#Now commit to the file/files with th e-m otion to add text about hwat changes have been made
+git commit -m "Adding script for fastqc and cutadapt"
+
+#Now remote in to a Github. First if you don't have the remote added, add the remote URL and name it. In this case I named it bioinformatics
+git remote add bioinformatics  https://github.com/BI-CTSICN/Bioinformatics-Core.git
+
+#Now push the changes made to bioinformatics master branch
+git push bioinformatics  master
+#This should ask for username and password for Github
+
+#The following steps are for an error that occurred while pushing
+git fetch bioinformatics master:tmp
+git rebase tmp
+git push bioinformatics HEAD:master
+git branch -D tmp
+
+#These command are in case for you to delete a particular branch.
+git push bioinformatics --delete COMBAT
+git push bioinformatics --delete Bioinformatics_Pipeline

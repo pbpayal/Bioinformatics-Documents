@@ -1,0 +1,98 @@
+#Fusion analysis Pipeline 
+
+#Fastqc
+
+#Trimming (final 50 bp)
+#Trimming first 5bp
+cutadapt -u 5 -o trimmed_TS21_S2_R1_001.fastq TS21_S2_R1_001.fastq
+cutadapt -u 5 -o trimmed_TS21_S2_R3_001.fastq TS21_S2_R3_001.fastq
+
+#Trimming last 46bp
+cutadapt -u -46 -o trimmed_end_TS21_S2_R1_001.fastq out.TS21_S2_R1_001.fastq
+cutadapt -u -46 -o trimmed_end_TS21_S2_R3_001.fastq out.TS21_S2_R3_001.fastq
+
+#Fatsqc
+
+#Tophat 2.1.1
+tophat -p 8 -r 100 --no-novel-juncs --no-coverage-search -G /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Genomes/Human/Homo_sapiens.GRCh38.91.gtf /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Genomes/Human/Homo_sapiens.GRCh38.dna.toplevel_ERCC92 /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Toru_pairedended_human/G74_pairedend/out.TS21_S2_R1_001.fastq /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Toru_pairedended_human/G74_pairedend/out.TS21_S2_R3_001.fastq
+
+
+#Tophat Fusion version 2.1.0
+tophat -p 8 -r 100 -o /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Genomes/Human/tophat_fusion_2.1.0 --fusion-search --no-coverage-search --bowtie1 --mate-std-dev 80 --max-intron-length 100000 --fusion-min-dist 100000 --fusion-anchor-length 13 --fusion-ignore-chromosomes chrM -G /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Genomes/Human/Homo_sapiens.GRCh38.91_ERCC92.gtf /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Genomes/Human/Homo_sapiens.GRCh38.dna.toplevel_ERCC92 /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Toru_pairedended_human/G74_pairedend/out.TS21_S2_R1_001.fastq /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Toru_pairedended_human/G74_pairedend/out.TS21_S2_R3_001.fastq
+
+tophat -p 8 -r 100 -o /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Toru_pairedended_human/G74_pairedend/TS20/TS20_tophat_out --fusion-search --no-coverage-search --bowtie1 --mate-std-dev 80 --max-intron-length 100000 --fusion-min-dist 100000 --fusion-anchor-length 13 --fusion-ignore-chromosomes chrM -G /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Genomes/Human/Homo_sapiens.GRCh38.91_ERCC92.gtf /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Genomes/Human/Homo_sapiens.GRCh38.dna.toplevel_ERCC92 /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Toru_pairedended_human/G74_pairedend/TS20/out.TS20_S1_R1_001.fastq /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Toru_pairedended_human/G74_pairedend/TS20/out.TS20_S1_R3_001.fastq
+
+#Filter out Fusion genes with by at least 100 spanning reads.
+#Here, $5 is the number of spanning reads, this command shows the fusions supported by at least 100 spanning reads.
+awk '{if($5 > 100) print}' fusions.out | sed 's/@\t/\n/g' > fusions_filter.out
+
+#If you run Hisat2, you might get SAM, then covert SAM to BAM
+samtools view -S -b sample.sam > sample.bam 
+
+#Picard Sort
+picard SortSam INPUT=accepted_hits.bam OUTPUT=picsort_accepted_hits.bam SORT_ORDER=coordinate VALIDATION_STRINGENCY=LENIENT
+
+#Sort bam output file using Samtools
+samtools sort  -o accepted_hits_sorted.bam -O bam accepted_hits.bam
+
+#Check the head for the sorted and before sorted files
+samtools view accepted_hits_sorted.bam | head
+samtools view accepted_hits.bam | head
+
+#To separate out alignments from paired-end datasets and single-end datasets just use samtools:
+samtools view -bf 1 foo.bam > foo.paired-end.bam
+samtools view -bF 1 foo.bam > foo.single-end.bam
+
+To get the unmapped reads from a bam file use :
+
+samtools view -f 4 file.bam > unmapped.sam, the output will be in sam
+
+to get the output in bam use : samtools view -b -f 4 file.bam > unmapped.bam
+
+To get only the mapped reads use the parameter 'F', which works like -v of grep and skips the alignments for a specific flag.
+
+samtools view -b -F 4 file.bam > mapped.bam
+
+#To test if your bam contains paired reads
+samtools view -c -F 1 accepted_hits_sorted_dedup.bam
+
+#To test if your bam contains single reads
+samtools view -c -f 1 accepted_hits_sorted_dedup.bam
+
+#Check on BAM file
+samtools view -H bam_output
+
+
+#Nugen Dedup, please activate python2 environment in conda with samtools 0.1.19, python2.7
+python nudup.py -2 -f TS20_S1_R2_001.fastq -o picsort_nudup -s 8 -l 8 --old-samtools picsort_accepted_hits.bam
+
+#Samtools dedup
+samtools rmdup accepted_hits_sorted.bam accepted_hits_sorted_dedup.bam
+
+
+#RNASEQMetrics PICARD
+#To make intervals file from Ensemble GTF
+grep rRNA Mus_musculus.GRCm38.91.gtf > Mus_musculus.GRCm38.91.rRNA.gtf
+grep rRNA Mus_musculus.GRCm38.91.rRNA.gtf | awk 'BEGIN{OFS="\t"}{print $1, $4-1, $5}' > Mus_musculus.GRCm38.91.rRNA.intervals.bed
+#Get the ref_flat.txt file from UCSC, if the other things are fromEnseble  remove char from file
+Mouse mm10 - ftp://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/
+Human hg38 - http://hgdownload.cse.ucsc.edu/goldenPath/hg38/
+cat refFlat.txt | sed 's/chr//' > refFlat_chr_rem.txt
+
+#Biostars
+So the first thing you need to do is get the header from your SAM/BAM file:
+
+samtools view -H [your.bam] > intervalList.txt
+
+If your GTF file is standard and we assume that it contains only ribosomal intervals, then we need the first, fourth, fifth, seventh, and ninth fields from the file. We can append them onto our text file which contains the header:
+
+cut -s -f 1,4,5,7,9 [your.gtf] >> intervalListBody.txt
+
+cat  intervalList.txt intervalListBody.txt > final_interval.txt
+
+#Counts
+htseq-count --format bam --order pos -t exon accepted_hits_sorted_dedup.bam /Users/pbanerjee/Documents/Bioinfo_Unit_RNAseq/Genomes/Human/Homo_sapiens.GRCh38.91_ERCC92.gtf > counts.txt
+
+#Filter Counts greater than 10 in column 2 of the htseq output file
+awk '{if ($2 > 10) {print}}' counts_nudup_star.txt
+
