@@ -21,29 +21,30 @@ sampleCondition2 <- c("control","control","control","control","exp","exp","exp",
 sampleTable2 <- data.frame(sampleName = sampleNames2, fileName = sampleFiles2, condition = sampleCondition2)
 treatments2 = c("control","exp")
 ddsHTSeq2 <- DESeqDataSetFromHTSeqCount(sampleTable = sampleTable2, directory = directory, design = ~ condition)
-colData(ddsHTSeq2)$condition <- factor(colData(ddsHTSeq2)$condition,levels = treatments2)
+colData(ddsHTSeq)$condition <- factor(colData(ddsHTSeq)$condition,levels = treatments)
 #guts
-dds2 <- DESeq(ddsHTSeq2)
-res2 <- results(dds2)
+dds <- DESeq(ddsHTSeq)
+res <- results(dds)
+summary(res)
 # order results by padj value (most significant to least)
-res2= subset(res2, padj<0.05)
-res2 <- res2[order(res2$padj),]
-res2
-summary(res2)
+res = subset(res, padj<0.05)
+res_ordered <- res[order(res$padj),]
+res_ordered
+summary(res_ordered)
 # How many adjusted p-values were less than 0.1?
-sum(res2$padj < 0.1, na.rm=TRUE)
-sum(res2$padj < 0.05, na.rm=TRUE)
+sum(res$padj < 0.1, na.rm=TRUE)
+sum(res$padj < 0.05, na.rm=TRUE)
 # p-adj factor alpha set to 0.05 instaed of 0.1 to be more stringent
-res2_05 <- results(dds2, alpha=0.05)
-summary(res2_05)
+res_05 <- results(dds, alpha=0.05)
+summary(res_05)
 
 # We can order our results table by the smallest p value
-resOrdered2 <- res2[order(res2$pvalue),]
+resOrdered <- res[order(res$pvalue),]
 
 # save data results and normalized reads to csv
-resdata2 <- merge(as.data.frame(res2), as.data.frame(counts(dds2,normalized =TRUE)), by = 'row.names', sort = FALSE)
-names(resdata2)[1] <- 'ensembl_gene_id'
-write.csv(resdata2, file = paste0(outputPrefix2, "-results-with-normalized.csv"))
+resdata <- merge(as.data.frame(res), as.data.frame(counts(dds,normalized =TRUE)), by = 'row.names', sort = FALSE)
+names(resdata)[1] <- 'ensembl_gene_id'
+write.csv(resdata, file = paste0(outputPrefix, "-results-with-normalized.csv"))
 # Exporting only the results which pass an adjusted p value threshold can be accomplished with the subset function, 
 # followed by the write.csv function.
 resSig2 <- subset(resOrdered2, padj < 0.1)
