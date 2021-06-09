@@ -1,0 +1,347 @@
+---
+title: "CBU Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+# install.packages("flexdashboard")
+library(flexdashboard)
+library(dplyr)
+# install.packages("readxl")
+# library(readxl)
+# install.packages("tidyverse")
+# library(tidyverse)
+# install.packages("plotly")
+# library(plotly)
+# install.packages("ggmap")
+# library(ggmap)
+library(ggplot2)
+
+
+# Read file
+
+projects = read.csv("/Users/pbanerjee/Documents/Payal_Scripts/R/CBU_dashboard/BioinformaticsInitia_DATA_LABELS_2021-02-19_1452.csv", header = T)
+
+```
+
+Institution
+===
+Row {data-width=650}
+-----------------------------------------------------------------------
+### Total number of CNMC requests
+```{r}
+# CNMC
+institution = projects %>% filter(Institution == "CNMC") %>% summarize(n())
+valueBox(value = institution,icon = "fa-hospital",caption = "CNMC",color = "green")
+```
+
+### Total number of GW requests
+```{r}
+# GW
+institution = projects %>% filter(Institution == "GW") %>% summarize(n())
+valueBox(value = institution,icon = "fa-university",caption = "GW",color = "orange")
+```
+
+Row
+-------
+### Requests per Institution from 2020 
+```{r}
+library(plotly)
+pie=projects %>% 
+  group_by(Institution) %>% 
+  summarise(count=n())
+
+pie=plot_ly(pie) %>% 
+  add_pie(labels=pie$Institution,values=pie$count,hole=0.6)
+pie
+
+# Orca currently not working with Rstudio
+# orca(pie,"pie_institution.png")
+```
+
+Department
+===
+Row {data-width=250}
+-----------------------------------------------------------------------
+### Genmed 
+```{r}
+# Genmed
+department_genmed = projects %>% filter(Department == "Genmed") %>% summarize(n())
+valueBox(value = department_genmed,icon = "fa-gene",caption = "Genmed",color = "green")
+```
+
+### Neuroscience
+```{r}
+# Neuroscience
+department_neuro = projects %>% filter(Department == "Neuro") %>% summarize(n())
+valueBox(value = department_neuro,icon = "fa-brain",caption = "Neuro",color = "orange")
+```
+
+### SZI
+```{r}
+# SZI
+department_szi = projects %>% filter(Department == "SZI") %>% summarize(n())
+valueBox(value = department_szi,icon = "fa-connectdevelop",caption = "SZI",color = "blue")
+```
+
+### Cancer
+```{r}
+# Cancer
+department_cancer = projects %>% filter(Department == "CCIR") %>% summarize(n())
+valueBox(value = department_cancer,icon = "fa-disease",caption = "CCIR",color = "coral")
+```
+
+### GW-departments
+```{r}
+# GW-departments
+department_GW = projects %>% filter(Department == "Other - GW") %>% summarize(n())
+valueBox(value = department_cancer,icon = "fa-university",caption = "Other-GW",color = "purple")
+```
+
+Row
+--------
+### Requests per Department from 2020
+```{r}
+library(plotly)
+#Summarise and group by Experimental Design 
+departments_plot=projects %>% 
+  group_by(Department) %>% 
+  summarise(count=n())
+
+#Use spread to make the table ready for plots
+# departments_plot=spread(departments_plot,key = Experimental.Design,value = count)
+
+#Bar chart by country
+departments_plot=plot_ly(departments_plot,
+           # x=c(departments_plot$Exome,departments_plot$`RNA Seq`,departments_plot$`Single Cell Seq`),
+           x= departments_plot$Department,
+           y=departments_plot$count, type = "bar", name = "Departments")
+  
+departments_plot
+
+```
+
+
+Experimental Design
+===
+
+Row {data-width=500}
+----------
+### Experimental Design for all Departments
+```{r}
+library(plotly)
+library(ggplot2)
+#Summarise and group by Experimental Design
+# departments_plot=projects %>%
+#   group_by(Department) %>%
+#   summarise(count=n())
+experiments=projects %>%
+  group_by(Experimental.Design) %>%
+  summarise(count=n())
+
+### Movement by month
+
+h1=projects %>%
+  group_by(Experimental.Design) %>%
+  summarise(count=n())
+
+pie=plot_ly(h1) %>%
+  add_pie(labels=h1$Experimental.Design,values=h1$count,hole=0.6)
+pie
+```
+
+Row {data-width=850}
+-----------------
+### Experiments per Derpartment
+```{r}
+library(plotly)
+#Summarise and group by
+genmed=projects %>%
+  filter(`Department`=="Genmed") %>%
+  group_by(Experimental.Design) %>%
+  summarise(count=n())
+#Bar chart by
+genmed_plot=plot_ly(genmed,
+           x= genmed$Experimental.Design,
+           y=genmed$count, type = "bar", name = "Genmed")
+#genmed_plot
+neuro_plot=projects %>%  
+   filter(`Department`=="Neuro") %>%  
+   group_by(Experimental.Design) %>%  
+   summarise(count=n()) 
+ #Bar chart by  
+ neuro_plot=plot_ly(neuro_plot, 
+            x= neuro_plot$Experimental.Design, 
+            y=neuro_plot$count, type = "bar", name = "Neuroscience") 
+#Summarise and group by
+ ccir_plot=projects %>%
+   filter(`Department`=="CCIR") %>%
+   group_by(Experimental.Design) %>%
+   summarise(count=n())
+ #Bar chart by
+ ccir_plot=plot_ly(ccir_plot,
+            x= ccir_plot$Experimental.Design,
+            y=ccir_plot$count, type = "bar", name = "CCIR")
+ #Summarise and group by
+ szi_plot=projects %>%
+   filter(`Department`=="SZI") %>%
+   group_by(Experimental.Design) %>%
+   summarise(count=n())
+ #Bar chart by
+ szi_plot=plot_ly(szi_plot,
+            x= szi_plot$Experimental.Design,
+            y=szi_plot$count, type = "bar", name = "SZI")
+ #Summarise and group by
+ gw_plot=projects %>%
+   filter(`Department`=="Other - GW") %>%
+   group_by(Experimental.Design) %>%
+   summarise(count=n())
+ #Bar chart by
+ gw_plot=plot_ly(gw_plot,
+            x= gw_plot$Experimental.Design,
+            y=gw_plot$count, type = "bar", name = "GW")
+ 
+ 
+ #subplots
+ subplot(genmed_plot,neuro_plot,ccir_plot,szi_plot,gw_plot)
+
+```
+
+<!-- Row  -->
+<!-- -----------------  -->
+<!-- ### Neuroscience  -->
+
+<!-- ```{r}  -->
+<!--  library(plotly)  -->
+<!--  #Summarise and group by   -->
+<!--  departments_plot=projects %>%   -->
+<!--    filter(`Department`=="Neuro") %>%   -->
+<!--    group_by(Experimental.Design) %>%   -->
+<!--    summarise(count=n())  -->
+<!--  #Bar chart by   -->
+<!--  departments_plot=plot_ly(departments_plot,  -->
+<!--             x= departments_plot$Experimental.Design,  -->
+<!--             y=departments_plot$count, type = "bar", name = "Neuroscience Requests")  -->
+
+<!--  departments_plot  -->
+<!-- ```  -->
+
+<!-- Row -->
+<!-- ----------------- -->
+<!-- ### CCIR -->
+<!-- ```{r} -->
+<!--  library(plotly) -->
+<!--  #Summarise and group by -->
+<!--  departments_plot=projects %>% -->
+<!--    filter(`Department`=="CCIR") %>% -->
+<!--    group_by(Experimental.Design) %>% -->
+<!--    summarise(count=n()) -->
+
+<!--  #Bar chart by -->
+<!--  departments_plot=plot_ly(departments_plot, -->
+<!--             x= departments_plot$Experimental.Design, -->
+<!--             y=departments_plot$count, type = "bar", name = "CCIR Requests") -->
+
+<!--  departments_plot -->
+
+<!-- ``` -->
+
+<!-- Row {data-width=1000} -->
+<!-- ----------------- -->
+<!-- ### SZI -->
+<!-- ```{r} -->
+<!--  library(plotly) -->
+<!--  #Summarise and group by -->
+<!--  departments_plot=projects %>% -->
+<!--    filter(`Department`=="SZI") %>% -->
+<!--    group_by(Experimental.Design) %>% -->
+<!--    summarise(count=n()) -->
+
+<!--  #Bar chart by -->
+<!--  departments_plot=plot_ly(departments_plot, -->
+<!--             x= departments_plot$Experimental.Design, -->
+<!--             y=departments_plot$count, type = "bar", name = "SZI Requests") -->
+
+<!--  departments_plot -->
+
+<!-- ``` -->
+
+<!-- Row -->
+<!-- ----------------- -->
+<!-- ### GW -->
+<!-- ```{r} -->
+<!--  library(plotly) -->
+<!--  #Summarise and group by -->
+<!--  departments_plot=projects %>% -->
+<!--    filter(`Department`=="Other - GW") %>% -->
+<!--    group_by(Experimental.Design) %>% -->
+<!--    summarise(count=n()) -->
+
+<!--  #Bar chart by -->
+<!--  departments_plot=plot_ly(departments_plot, -->
+<!--             x= departments_plot$Experimental.Design, -->
+<!--             y=departments_plot$count, type = "bar", name = "GW Requests") -->
+
+<!-- departments_plot -->
+
+<!-- ``` -->
+
+
+
+Publications
+===
+
+### Papers
+
+| Title                                                                                                                                                    | DOI                                          | Journal                               |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|---------------------------------------|
+| Endothelin-1 signaling maintains glial progenitor proliferation in the postnatal subventricular zone                                                    | https://doi.org/10.1038/s41467-020-16028-8   | Nature Communications                 |
+| Identification of amygdala-expressed genes associated with autism spectrum disorder                                                                     | https://doi.org/10.1186/s13229-020-00346-1   | Molecular Autism                      |
+| A cross-sectional analysis of the urine microbiome of children with neuropathic bladders                                                                | https://doi.org/10.1016/j.jpurol.2020.02.005 | Journal of Pediatric Urology          |
+| Immunotherapy of Relapsed and Refractory Solid Tumors With Ex Vivo Expanded  Multiantigen-Associated Specific Cytotoxic T Lymphocytes: A Phase I  Study | https://doi.org/10.1200/jco.19.00177         | Journal of Clinical Oncology          |
+| A tool for enhanced annotation of genomic structural variants                                                                                           | https://doi.org/10.1186/s12864-020-07182-w   | BMC Genomics                          |
+| Long-read single-molecule maps of the functional methylome.                                                                                             | https://doi.org/10.1101/gr.240739.118        | Genome Research                       |
+| Detection of a mosaic CDKL5 deletion and inversion by optical genome mapping ends an exhaustive diagnostic odyssey                                      | Accepted                                     | Molecular Genetics & Genomic Medicine |
+| Long Reads Capture Simultaneous Enhancer-Promoter Methylation Status for Cell-type Deconvolution                                                        | https://doi.org/10.1101/2021.01.28.428654    | bioRxiv                               |
+| Environmental enrichment ameliorates perinatal brain injury and promotes functional white matter recovery | https://doi.org/10.1038/s41467-020-14762-7 | Nature Communications |
+
+
+Seminars
+===
+### Topics
+
+#### **Single Cell RNA-Sequencing: A Primer**
+* Date: November 21, 2019
+* Dr. Surajit Bhattacharya
+
+#### **Applications of Optical Genome Mapping (PDF)**
+* Date: October 1, 2019
+* Dr. Hayk Barseghyan
+
+#### **Variant Identification and Interpretation from Next Generation Sequencing (PDF)**
+* Date: May 28, 2019
+* Dr. Seth Berger
+
+#### **Understanding Transcriptomics with RNA Seq and Microarrays (PDF)**
+* Date: March 11, 2019
+* Payal Banerjee
+
+Grants 
+=======
+
+### **Grants**
+
+| Title                                                                                                                                                                            | Center       | Type | Status   |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|------|----------|
+| REDS-IV-P                                                                                                                                                                        | CTSI-CN      | R01  | Received |
+| Genomic Medicine Training for Clinicians                                                                                                                                         | Genmed       | R25  | Waiting  |
+| DC-IDDRC                                                                                                                                                                         | Neuroscience | U54  | Received |
+| Growth Introduction Aims Research Plan                                                                                                                                           | Genmed       | R01  | Unknown  |
+| Identify the transcriptional pathways that comprise the FPC-CTD  “regulon” in mouse renal epithelia and determine whether the FPC-CTD  renal regulon differs in mouse and human. | CTSI-CN      | R01  | Unknown  |
+| Mechanism of synaptic specificity in visual circuits                                                                                                                             | Neuroscience | R01  | Unknown  |
+| The effect of mesenchymal stromal cell derived exosome through cardiopulmonary bypass                                                                                            | Neuroscience | R01  | Unknown  |
+| Molecular and functional heterogeneity of the developing and regenerating subventricular zone                                                                                    | Neuroscience | R01  | Unknown  |
+| Mechanism of synaptic specificity in visual circuits                                                                                                                             | Neuroscience | R01  | Unknown  |

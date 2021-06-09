@@ -1,0 +1,31 @@
+﻿Record ID,Institution,Department,IDDRC Funded Research,Service,Experimental Design,Bioinformatics Analysis,Platform  
+65,CNMC,Genmed,No,Data Analysis,Exome,SNV,Illumina
+66,CNMC,Neuro,No,Consultation,RNA Seq,DGE,Illumina
+67,CNMC,SZI,No,Data Analysis,Microarray,DGE,Affymetrix(Microarray)
+68,CNMC,Neuro,Yes,Data Analysis,RNA Seq,"DGE, Pathway",Illumina
+69,CNMC,Neuro,No,Consultation,RNA Seq,Pathway,Illumina
+70,CNMC,Neuro,Yes,Data Analysis,Spatial Transcriptomics,"DGE, Pathway",Illumina
+71,CNMC,Neuro,Yes,Data Analysis,RNA Seq,"DGE, Pathway",Illumina
+72,CNMC,SZI,No,Consultation,Microarray,DGE,Affymetrix(Microarray)
+73,CNMC,Genmed,No,Data Analysis,RNA Seq,"DGE, Pathway",Other
+74,CNMC,Genmed,No,Data Analysis,RNA Seq,Pathway,Other
+75,CNMC,Genmed,No,Data Analysis,RNA Seq,Pathway,Other
+76,GW,Other - GW,No,Data Analysis,ChIP,Peak Calling,Illumina
+77,GW,Other - GW,No,Data Analysis,ChIP,Heatmap,Illumina Methylation Arrays
+78,CNMC,Genmed,No,Data Analysis,RNA Seq,DGE,Illumina
+79,CNMC,SZI,No,Data Analysis,Microarray,DGE,Affymetrix(Microarray)
+80,CNMC,Neuro,No,Data Analysis,RNA Seq,Heatmap,Illumina
+81,CNMC,Neuro,No,Data Analysis,Single Cell Seq,DGE,Illumina
+82,CNMC,Neuro,No,Data Analysis,Single Cell Seq,Other,Illumina
+83,CNMC,Genmed,Yes,Data Analysis,RNA Seq,DGE,Illumina
+84,CNMC,Genmed,No,Data Analysis,RNA Seq,DGE,Illumina
+85,CNMC,Neuro,Yes,Data Analysis,Single Cell Seq,DGE,Illumina
+86,CNMC,Neuro,Yes,Data Analysis,Single Cell Seq,DGE,Illumina
+87,CNMC,Genmed,Yes,Data Analysis,Single Cell Seq,DGE,Illumina
+88,CNMC,Neuro,Yes,Data Analysis,Single Cell Seq,Pseudotime,Illumina
+89,CNMC,Neuro,No,Data Analysis,Single Cell Seq,Pseudotime,Illumina
+90,CNMC,Neuro,Yes,Data Analysis,RNA Seq,DGE,Illumina
+91,CNMC,Neuro,Yes,Consultation,Spatial Transcriptomics,Other,Illumina
+92,CNMC,Neuro,No,Data Analysis,Single Cell Seq,DGE,Illumina
+93,CNMC,CCIR,No,Data Analysis,T-cell Receptor Seq,T-cell Repertoire,Illumina
+94,CNMC,CCIR,No,Data Analysis,T-cell Receptor Seq,T-cell Repertoire,Illumina

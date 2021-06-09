@@ -1,0 +1,13 @@
+install.packages("flexdashboard")
+library(flexdashboard)
+install.packages("readxl")
+library(readxl)
+library(dplyr)
+install.packages("tidyverse")
+library(tidyverse)
+install.packages("plotly")
+library(plotly)
+install.packages("ggmap")
+library(ggmap)
+library(ggplot2)
+
