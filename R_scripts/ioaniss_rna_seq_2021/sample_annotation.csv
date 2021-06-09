@@ -1,0 +1,13 @@
+﻿sample,condition
+SE1,sepsis_EVs
+SE2,sepsis_EVs
+SE3,sepsis_EVs
+CM1,control_media
+CM2,control_media
+CM3,control_media
+SM1,sepsis_media
+SM2,sepsis_media
+SM3,sepsis_media
+CE1,control_EV
+CE2,control_EV
+CE3,control_EV
